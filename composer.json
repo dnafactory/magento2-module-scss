@@ -1,0 +1,32 @@
+{
+  "name": "dnafactory/module-scss",
+  "type": "magento2-module",
+  "description": "Provides a scss preprocessor to Magento 2",
+  "keywords": ["Magento2", "scss", "sass", "preprocessor"],
+  "license": [
+    "BSD-2.0"
+  ],
+  "require": {
+    "php": "~7.1|~7.2",
+    "scssphp/scssphp": "^1.4.0"
+  },
+  "authors": [
+    {
+      "name": "DNAFactory",
+      "email": "info@dnafactory.it",
+      "homepage": "https://www.dnafactory.it",
+      "role": "Owner"
+    },
+    {
+      "name": "Ciro Arcadio",
+      "email": "ciro.arcadio@dnafactory.it",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "files": [ "registration.php" ],
+    "psr-4": {
+      "DNAFactory\\Scss\\": ""
+    }
+  }
+}
