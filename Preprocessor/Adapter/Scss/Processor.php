@@ -5,11 +5,14 @@
  */
 namespace DNAFactory\Scss\Preprocessor\Adapter\Scss;
 
+use Magento\Framework\App\State;
+use Magento\Framework\Css\PreProcessor\File\Temporary;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\View\Asset\File;
 use Magento\Framework\View\Asset\Source;
 use Magento\Framework\View\Asset\ContentProcessorInterface;
+use ScssPhp\ScssPhp\OutputStyle;
 
 /**
  * Class Processor
@@ -22,28 +25,46 @@ class Processor implements ContentProcessorInterface
     private $logger;
 
     /**
+     * @var State
+     */
+    private $appState;
+
+    /**
      * @var Source
      */
     private $assetSource;
 
     /**
-     * @var ScssPhp\ScssPhp\Compiler
+     * @var Temporary
+     */
+    private $temporaryFile;
+
+    /**
+     * @var \ScssPhp\ScssPhp\Compiler
      */
     private $compiler;
     /**
      * Constructor
      *
+     * @param State $appState
      * @param Source $assetSource
      * @param LoggerInterface $logger
+     * @param \ScssPhp\ScssPhp\Compiler $compiler
+     * @param Temporary $temporaryFile
      */
     public function __construct(
+        State $appState,
         Source $assetSource,
         LoggerInterface $logger,
-        \ScssPhp\ScssPhp\Compiler $compiler)
+        \ScssPhp\ScssPhp\Compiler $compiler,
+        Temporary $temporaryFile
+    )
     {
         $this->assetSource = $assetSource;
         $this->logger = $logger;
         $this->compiler = $compiler;
+        $this->temporaryFile = $temporaryFile;
+        $this->appState = $appState;
     }
 
     /**
@@ -62,9 +83,18 @@ class Processor implements ContentProcessorInterface
                 return '';
             }
 
+            $this->compiler->setOutputStyle(($this->appState->getMode() !== State::MODE_DEVELOPER)?
+                OutputStyle::COMPRESSED : OutputStyle::EXPANDED);
+
+            $tmpFilePath = $this->temporaryFile->createFile($path, $content);
+
             $this->compiler->addImportPath(dirname($asset->getSourceFile()));
 
-            return $this->compiler->compile($content);
+            gc_disable();
+            $content = $this->compiler->compile($content, $tmpFilePath);
+            gc_enable();
+
+            return $content;
         } catch (\Exception $e) {
             $errorMessage = PHP_EOL . self::ERROR_MESSAGE_PREFIX . PHP_EOL . $path . PHP_EOL . $e->getMessage();
             $this->logger->critical($errorMessage);
