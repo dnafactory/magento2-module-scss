@@ -3,12 +3,14 @@
  * Copyright © 2016 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
-namespace DNAFactory\Scss\Preprocessor\Adapter\Scss;
+namespace DNAFactory\Scss\PreProcessor\Adapter\Scss;
 
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\State;
+use Magento\Framework\Css\PreProcessor\Config;
 use Magento\Framework\Css\PreProcessor\File\Temporary;
+use Magento\Framework\Filesystem;
 use Psr\Log\LoggerInterface;
-use Magento\Framework\Phrase;
 use Magento\Framework\View\Asset\File;
 use Magento\Framework\View\Asset\Source;
 use Magento\Framework\View\Asset\ContentProcessorInterface;
@@ -51,13 +53,17 @@ class Processor implements ContentProcessorInterface
      * @param LoggerInterface $logger
      * @param \ScssPhp\ScssPhp\Compiler $compiler
      * @param Temporary $temporaryFile
+     * @param Config $config
+     * @param Filesystem
      */
     public function __construct(
         State $appState,
         Source $assetSource,
         LoggerInterface $logger,
         \ScssPhp\ScssPhp\Compiler $compiler,
-        Temporary $temporaryFile
+        Temporary $temporaryFile,
+        Config $config,
+        Filesystem $filesystem
     )
     {
         $this->assetSource = $assetSource;
@@ -65,6 +71,9 @@ class Processor implements ContentProcessorInterface
         $this->compiler = $compiler;
         $this->temporaryFile = $temporaryFile;
         $this->appState = $appState;
+        $includePath = $filesystem->getDirectoryRead(DirectoryList::VAR_DIR)
+            ->getAbsolutePath($config->getMaterializationRelativePath());
+        $this->compiler->addImportPath($includePath);
     }
 
     /**

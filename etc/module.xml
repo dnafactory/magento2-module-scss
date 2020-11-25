@@ -3,6 +3,7 @@
     <module name="DNAFactory_Scss" setup_version="1.0.0">
         <sequence>
             <module name="Magento_Developer" />
+            <module name="Magento_Deploy" />
         </sequence>
     </module>
 </config>

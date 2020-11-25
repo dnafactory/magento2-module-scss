@@ -4,7 +4,7 @@
         <arguments>
             <argument name="alternatives" xsi:type="array">
                 <item name="scss" xsi:type="array">
-                    <item name="class" xsi:type="string">DNAFactory\Scss\Preprocessor\Adapter\Scss\Processor</item>
+                    <item name="class" xsi:type="string">DNAFactory\Scss\PreProcessor\Adapter\Scss\Processor</item>
                 </item>
                 <item name="less" xsi:type="array">
                     <item name="after" xsi:type="string">scss</item>
@@ -13,16 +13,45 @@
             </argument>
         </arguments>
     </virtualType>
-    <virtualType name="AssetPreProcessorPoolForSourceThemeDeploy" type="Magento\Framework\View\Asset\PreProcessor\Pool">
+    <virtualType name="PreProcessorInstructionImportForScssFlow" type="DNAFactory\Scss\PreProcessor\Instruction\Import">
+        <arguments>
+            <argument name="relatedFileGenerator" xsi:type="object">FileGeneratorPublicationDecoratorForBaseFlow</argument>
+        </arguments>
+    </virtualType>
+    <!-- @api -->
+    <virtualType name="AssetPreProcessorPool">
         <arguments>
             <argument name="preprocessors" xsi:type="array">
                 <item name="scss" xsi:type="array">
+                    <item name="theme_import" xsi:type="array">
+                        <item name="class" xsi:type="string">DNAFactory\Scss\Model\View\Asset\PreProcessor\VarsImport</item>
+                    </item>
                     <item name="magento_import" xsi:type="array">
+                        <item name="after" xsi:type="string">theme_import</item>
                         <item name="class" xsi:type="string">Magento\Framework\Css\PreProcessor\Instruction\MagentoImport</item>
                     </item>
                     <item name="import" xsi:type="array">
                         <item name="after" xsi:type="string">magento_import</item>
-                        <item name="class" xsi:type="string">PreProcessorInstructionImportForSourceThemeDeploy</item>
+                        <item name="class" xsi:type="string">PreProcessorInstructionImportForScssFlow</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="AssetPreProcessorPoolForSourceThemeDeploy">
+        <arguments>
+            <argument name="preprocessors" xsi:type="array">
+                <item name="scss" xsi:type="array">
+                    <item name="theme_import" xsi:type="array">
+                        <item name="class" xsi:type="string">DNAFactory\Scss\Model\View\Asset\PreProcessor\VarsImport</item>
+                    </item>
+                    <item name="magento_import" xsi:type="array">
+                        <item name="after" xsi:type="string">theme_import</item>
+                        <item name="class" xsi:type="string">Magento\Framework\Css\PreProcessor\Instruction\MagentoImport</item>
+                    </item>
+                    <item name="import" xsi:type="array">
+                        <item name="after" xsi:type="string">magento_import</item>
+                        <item name="class" xsi:type="string">PreProcessorInstructionImportForScssFlow</item>
                     </item>
                 </item>
             </argument>
