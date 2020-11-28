@@ -8,8 +8,12 @@
   ],
   "require": {
     "php": "~7.1|~7.2",
-    "scssphp/scssphp": "^1.4.0"
+    "scssphp/scssphp": "^1.4.0",
+    "wikimedia/less.php": "1.8.2.1 as 1.8.2"
   },
+  "repositories": [
+    { "type": "vcs", "url": "https://github.com/dnafactory/wikimedia-less.php-patched" }
+  ],
   "authors": [
     {
       "name": "DNAFactory",
