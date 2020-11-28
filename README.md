@@ -35,4 +35,16 @@ When it comes to needs, you can simply use the **@vars_import** directive on top
 //@magento_import 'source/_extends.scss';
 ```
 
+All less variables will be translated into scss readable ones, so you can then reference them in your scss subsequent assets. 
+
+Ex: *@primary__color* will be accessible as **$primary__color**
+
+
+When you are coding in a module context you may need to import Magento 2 .less lib vars.
+Therefore, to avoid context issues, it may come in handy to use the **@vars_import** directive with the addition of the **(lib)** identifier. Ex:
+
+```scss
+//@vars_import (lib) 'source/lib/_lib.less'
+```
+
 *Happy Coding*

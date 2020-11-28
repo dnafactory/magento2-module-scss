@@ -5,7 +5,7 @@
  */
 namespace DNAFactory\Scss\Model\View\Asset\PreProcessor;
 
-use Magento\Framework\App\State;
+use DNAFactory\Scss\Api\AssetProcessorFilesystemManagementInterface;
 use Magento\Framework\Css\PreProcessor\ErrorHandlerInterface;
 use Magento\Framework\View\Asset\LocalInterface;
 use Magento\Framework\Css\PreProcessor\Instruction\MagentoImport;
@@ -26,17 +26,22 @@ class VarsImport extends MagentoImport
      * PCRE pattern that matches @theme_import instruction
      */
     const REPLACE_PATTERN =
-        '#//@vars_import(?P<reference>\s+\(reference\))?\s+[\'\"](?P<path>(?![/\\\]|\w:[/\\\])[^\"\']+\.less)[\'\"]\s*?;#';
-    /**
-     * @var State
-     */
-    protected $state;
+        '#//@vars_import(?P<lib>\s+\(lib\))?\s+[\'\"](?P<path>(?![/\\\]|\w:[/\\\])[^\"\']+\.less)[\'\"]\s*?;#';
 
     /**
      * @var Repository
      */
     protected $assetRepo;
 
+    /**
+     * @var AssetProcessorFilesystemManagementInterface
+     */
+    protected $filesystemManager;
+
+    /**
+     * @var \Less_Parser
+     */
+    private $parser;
 
     /**
      * VarsImport constructor.
@@ -45,7 +50,7 @@ class VarsImport extends MagentoImport
      * @param ErrorHandlerInterface $errorHandler
      * @param \Magento\Framework\View\Asset\Repository $assetRepo
      * @param \Magento\Framework\View\Design\Theme\ListInterface $themeList
-     * @param State $state
+     * @param AssetProcessorFilesystemManagementInterface $assetProcessorFilesystemManagement
      */
     public function __construct(
         DesignInterface $design,
@@ -53,10 +58,16 @@ class VarsImport extends MagentoImport
         ErrorHandlerInterface $errorHandler,
         \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\View\Design\Theme\ListInterface $themeList,
-        State $state
+        AssetProcessorFilesystemManagementInterface $assetProcessorFilesystemManagement
     ){
-        $this->state = $state;
         $this->assetRepo = $assetRepo;
+        $this->filesystemManager = $assetProcessorFilesystemManagement;
+        $this->parser = new \Less_Parser(
+            [
+                'relativeUrls' => false,
+                'compress' => false
+            ]
+        );
         parent::__construct($design, $fileSource, $errorHandler, $assetRepo, $themeList);
     }
 
@@ -84,31 +95,44 @@ class VarsImport extends MagentoImport
     {
         $importsContent = '';
         try {
-            $parser = new \Less_Parser(
-                [
-                    'relativeUrls' => false,
-                    'compress' => $this->state->getMode() !== State::MODE_DEVELOPER
-                ]
-            );
             $matchedFileId = $matchedContent['path'];
             $relatedAsset = $this->assetRepo->createRelated($matchedFileId, $asset);
             $resolvedPath = $relatedAsset->getFilePath();
             $importFiles = $this->fileSource->getFiles($this->getTheme($relatedAsset), $resolvedPath);
-            /** @var $importFile \Magento\Framework\View\File */
+
+            $parsedVars = [];
+            $isLib = !empty($matchedContent['lib']);
+
             foreach ($importFiles as $importFile) {
-                $parser->parseFile($importFile->getFilename());
+                if($isLib) {
+                    $baseContext = $this->assetRepo->getStaticViewFileContext();
+                    $tempFile = $this->assetRepo->createAsset($resolvedPath, [
+                        'area' => $baseContext->getAreaCode(),
+                        'locale' => $baseContext->getLocale(),
+                        'theme' => $this->getTheme($relatedAsset)->getCode(),
+                        'module' => ''
+                    ]);
+                }else{
+                    $tempFile = $this->assetRepo->createRelated($importFile->getName(), $relatedAsset);
+                }
+
+                $varsContent = $this->filesystemManager->readVarsFromAsset($tempFile);
+
+                gc_disable();
+                $this->parser->parse($varsContent);
+                $this->parser->getCss();
+                $parsedVars = array_merge($parsedVars, $this->parser->getVariables());
+                gc_enable();
             }
-            $parsedVars = $parser->getVariables();
+
             if($parsedVars && count($parsedVars) > 0) {
                 $scssText = '';
-                $scssVars = [];
                 foreach ($parsedVars as $key => $value) {
                     $scssKey = preg_replace('/^@(.*)/', '\$$1', $key);
                     // normalize values
                     $value = preg_replace('#^(?:(?!(\"|\'|[a-zA-Z]|var|rgb|url)).)*$#','"$0"', trim($value));
                     // clear color values
                     $value = preg_replace('/^"(\#.+)"$/','$1', $value);
-                    $scssVars[$scssKey] = $value;
                     $scssText .= "${scssKey}: ${value};\n";
                 }
                 $importsContent = $scssText."\n";
