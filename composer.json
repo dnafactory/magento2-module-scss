@@ -1,7 +1,7 @@
 {
   "name": "dnafactory/module-scss",
   "type": "magento2-module",
-  "description": "Provides a scss preprocessor to Magento 2",
+  "description": "Provides an scss preprocessor to Magento 2",
   "keywords": ["Magento2", "scss", "sass", "preprocessor"],
   "license": [
     "BSD-3-Clause"
