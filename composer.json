@@ -4,7 +4,7 @@
   "description": "Provides a scss preprocessor to Magento 2",
   "keywords": ["Magento2", "scss", "sass", "preprocessor"],
   "license": [
-    "BSD-2.0"
+    "BSD-3-Clause"
   ],
   "require": {
     "php": "~7.1|~7.2",
