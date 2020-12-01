@@ -1,3 +1,9 @@
+1.0.1
+=============
+* Fixed:
+    * Most of the collected less variable values where parsed as quoted strings
+    * Less 'false' value is now parsed as null
+    
 1.0.0
 =============
 * Added:

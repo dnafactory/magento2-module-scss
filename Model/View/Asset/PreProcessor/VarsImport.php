@@ -130,7 +130,7 @@ class VarsImport extends MagentoImport
                 foreach ($parsedVars as $key => $value) {
                     $scssKey = preg_replace('/^@(.*)/', '\$$1', $key);
                     // normalize values
-                    $value = preg_replace('#^(?:(?!(\"|\'|[a-zA-Z]|var|rgb|url)).)*$#','"$0"', trim($value));
+                    $value = preg_replace('/^(false)$/','null', trim($value));
                     // clear color values
                     $value = preg_replace('/^"(\#.+)"$/','$1', $value);
                     $scssText .= "${scssKey}: ${value};\n";
