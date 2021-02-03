@@ -67,7 +67,7 @@ class Import extends BaseClass
         try{
             $temp->getContent();
         }catch(\Exception $e){
-            $matchedFileId = preg_replace('/(.+\/)?(.+)/', '$1_$2',$matchedFileId);
+            $matchedFileId = preg_replace('/(.+\/)?_?(.+)/', '$1_$2',$matchedFileId);
             $resolvedPath = $this->notationResolver->convertModuleNotationToPath($asset, $matchedFileId);
         }
 
