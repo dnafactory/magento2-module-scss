@@ -1,3 +1,8 @@
+1.0.2
+=============
+* Fixed:
+  * magento 2 fails to read the _extend.scss and the _module.scss from modules
+  
 1.0.1
 =============
 * Fixed:
