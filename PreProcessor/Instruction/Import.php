@@ -61,7 +61,7 @@ class Import extends BaseClass
 
         $resolvedPath = $this->notationResolver->convertModuleNotationToPath($asset, $matchedFileId);
         $temp = $this->assetRepository->createSimilar(
-            dirname($asset->getFilePath()).DS.$this->fixFileExtension($resolvedPath, $contentType),
+            dirname($asset->getFilePath()).DIRECTORY_SEPARATOR.$this->fixFileExtension($resolvedPath, $contentType),
             $asset
         );
         try{

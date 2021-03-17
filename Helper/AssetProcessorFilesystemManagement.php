@@ -65,7 +65,7 @@ class AssetProcessorFilesystemManagement implements \DNAFactory\Scss\Api\AssetPr
      * @inheritDoc
      */
     public function getAssetsMaterializationRelativePath(string $path = null){
-        $end = (!empty($path))? DS.$path : '';
+        $end = (!empty($path))? DIRECTORY_SEPARATOR.$path : '';
         return $this->config->getMaterializationRelativePath().$end;
     }
 
