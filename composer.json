@@ -7,9 +7,9 @@
     "BSD-3-Clause"
   ],
   "require": {
-    "php": "~7.1|~7.2",
+    "php": "^7.1|^8.1",
     "scssphp/scssphp": "^1.4.0",
-    "wikimedia/less.php": "1.8.2.1 as 1.8.2"
+    "wikimedia/less.php": "^3.0.0|1.8.2.1 as 1.8.2"
   },
   "repositories": [
     { "type": "vcs", "url": "https://github.com/dnafactory/wikimedia-less.php-patched" }
